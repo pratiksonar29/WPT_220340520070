@@ -1,0 +1,112 @@
+<html>
+<body>
+	<span>BOOK ID   </span><input type="text" id="bookid" placeholder="Book id"><span id="msg">MESSAGE</span><br><br>
+	<span>BOOK NAME </span><input type="text" id="bookname" placeholder="Book name"><br><br>
+	<span>BOOK'S PRICE    </span><input type="text" id="price" placeholder="Price"><br><br>
+	<button id="add">Add a book</button>
+	<p>show all books here</p>
+	<hr>
+	<p id="content"></p>
+
+</body>
+
+<script src="jquery-3.5.1.min.js"></script>
+<script>//our scrip will come here 
+
+	$(()=>{
+
+		function showbooks(){
+
+			let ajaxpara = {
+				data : {},
+				url: "http://localhost:8081/getbooksdtls",
+				type: "get",
+				datatype: "json",
+				success: (datagivenbyserver) => {
+					books = datagivenbyserver ;
+
+					let bookdetails = "";
+					for(let i = 0; i< books.length; ++i){
+						bookdetails += "<br>" + books[i].bookid + " ," + books[i].bookname + " ," + books[i].price;
+					}
+
+					$("#content"),html(bookdetails);
+			},
+			error : (error) => {console.log("failure" + error)}
+			
+		};
+
+		$.ajax(ajaxpara);
+	}
+
+		$("#bookid").blur(() =>{
+
+			let y = $("#bookid").val();
+			$("#bookid").prop('disabled',);
+			let ajaxpara = {
+				data : {x : y},
+				url: "http://localhost:8081/getbookdtls",
+				type: "get",
+				datatype: "json",
+				success: (output) => {
+					if(output.status){
+						$("#msg").text("Book details Found");
+						$("#bookname").val(output.bookdetails.bookname);
+						$("#price").val(output.bookdetails.price);
+					}
+					else{
+						$("#msg").text("add book")
+					}
+				},
+					error : (error) => {console.log("failure" + error)}
+				};
+
+				$.ajax(ajaxpara);
+			});
+			
+		});
+
+		$("#add").click(() =>{
+
+			let input = {
+				x: $("#bookid").val(),
+				y: $("#bookname").val(),
+				z: $("#price").val()
+			};
+
+			let ajaxpara = {
+				data : input,
+				url: "http://localhost:8081/addbook",
+				type: "get",
+				datatype: "json",
+				success: (output) => {
+					if(output.status){
+						$("#msg").text("Book added successfully");
+					}
+					else{
+						$("#msg").text("could not add book details")
+					}
+					showbooks();
+				},
+					error : (error) => {console.log("failure" + error)}
+				};
+
+				$.ajax(ajaxpara);
+			});
+
+$(document).ready(function()
+{
+console.log("no more sins");
+$("#add").click(function () 
+	{ 
+		//console.log("jquery works");
+		alert("jquery works")
+	});
+	
+});
+
+
+</script>
+
+
+</html>
