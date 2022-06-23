@@ -1,113 +1,112 @@
-<html>
-<body>
-<!-- 	hii -->
-	<span>BOOK ID   </span><input type="text" id="bookid" placeholder="Book id"><span id="msg">MESSAGE</span><br><br>
-	<span>BOOK NAME </span><input type="text" id="bookname" placeholder="Book name"><br><br>
-	<span>BOOK'S PRICE    </span><input type="text" id="price" placeholder="Price"><br><br>
-	<button id="add">Add a book</button>
-	<p>show all books here</p>
-	<hr>
-	<p id="content"></p>
+<!DOCTYPE html>
+<html lang="en">
 
-</body>
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<script src="jquery-3.5.1.min.js"></script>
 
-<script src="jquery-3.5.1.min.js"></script>
-<script>//our scrip will come here 
+	<script>
+		$(() => {
 
-	$(()=>{
+			function showcontent() {
+				let ajaxparams = {
+					data: {},
+					url: "http://localhost:8081/getAllBooks",
+					type: 'get',
+					dataType: 'json',
+					success: (datagivenbyserver) => {
+						books = datagivenbyserver;
+						let bookdetails = "";
 
-		function showbooks(){
+						for (let i = 0; i < books.length; i++) {
+							bookdetails += "<br/>" + books[i].bookid + " ," + books[i].bookname + "," + books[i].price;
+						}
+						$("#contents").html(bookdetails);
+					},
+					error: (error) => { console.log("Sever error" + error) }
+				};
+				$.ajax(ajaxparams);
+			}
+			$('#bookid').blur(()=>{
+				let y =$('#bookid').val();
 
-			let ajaxpara = {
-				data : {},
-				url: "http://localhost:8081/getbooksdtls",
-				type: "get",
-				datatype: "json",
-				success: (datagivenbyserver) => {
-					books = datagivenbyserver ;
+				let ajaxparams= {
+					data : {x:y},
+					url: "http://localhost:8081/getBook",
+					type: 'get',
+					dataType: 'json',
+					success : (output)=>{
+						if(output.bookfoundstatus){
+							$('#msg').text("book found");
+							$('#bookname').val(output.books.bookname);
+							$('#price').val(output.books.price);
+					
+						}
+						else{
+							$('#msg').text("book  not found");
+						}
+					},
+					error : (error)=>{console.log("error"+error)}
 
-					let bookdetails = "";
-					for(let i = 0; i< books.length; ++i){
-						bookdetails += "<br>" + books[i].bookid + " ," + books[i].bookname + " ," + books[i].price;
-					}
+				};
+				$.ajax(ajaxparams);
+			});
 
-					$("#content"),html(bookdetails);
-			},
-			error : (error) => {console.log("failure" + error)}
-			
-		};
+			$('#add').click(() => {
+				let input = {
+					x: $('#bookid').val(),
+					y: $('#bookname').val(),
+					z: $('#price').val()
+				}
 
-		$.ajax(ajaxpara);
-	}
+				let ajaxparams = {
+					data: input,
+					url: "http://localhost:8081/addBook",
+					type: 'get',
+					datatype: 'json',
+					success: (output) => {
+						if (output) { $('#msg').text(" book added successfully"); }
+						else {
+							$('#msg').text("could not add book");
+						}
 
-		$("#bookid").blur(() =>{
-
-			let y = $("#bookid").val();
-			$("#bookid").prop('disabled',);
-			let ajaxpara = {
-				data : {x : y},
-				url: "http://localhost:8081/getbookdtls",
-				type: "get",
-				datatype: "json",
-				success: (output) => {
-					if(output.status){
-						$("#msg").text("Book details Found");
-						$("#bookname").val(output.bookdetails.bookname);
-						$("#price").val(output.bookdetails.price);
-					}
-					else{
-						$("#msg").text("add book")
-					}
-				},
-					error : (error) => {console.log("failure" + error)}
+						showcontent();
+					},
+					error: (error) => { console.log("error" + error) }
 				};
 
-				$.ajax(ajaxpara);
+				$.ajax(ajaxparams);
+
+
+
 			});
-			
+
+
+
+			showcontent();
+
 		});
 
-		$("#add").click(() =>{
 
-			let input = {
-				x: $("#bookid").val(),
-				y: $("#bookname").val(),
-				z: $("#price").val()
-			};
+	</script>
 
-			let ajaxpara = {
-				data : input,
-				url: "http://localhost:8081/addbook",
-				type: "get",
-				datatype: "json",
-				success: (output) => {
-					if(output.status){
-						$("#msg").text("Book added successfully");
-					}
-					else{
-						$("#msg").text("could not add book details")
-					}
-					showbooks();
-				},
-					error : (error) => {console.log("failure" + error)}
-				};
+</head>
 
-				$.ajax(ajaxpara);
-			});
-
-$(document).ready(function()
-{
-console.log("no more sins");
-$("#add").click(function () 
-	{ 
-		//console.log("jquery works");
-		alert("jquery works")
-	});
-	
-});
-
-
-</script>
-
+<body>
+	<input type="text" id="bookid" placeholder="Enter BookId"><span id="msg">Message</span>
+	<br><br>
+	<input type="text" id="bookname" placeholder="Enter Bookname">
+	<br><br>
+	<input type="text" id="price" placeholder="Price">
+	<br><br>
+	<button id="add">Add a book</button>
+	<br><br>
+	<p>Show All Books here :</p>
+	<hr>
+	<p id="contents"></p>
+</body>
 
 </html>
